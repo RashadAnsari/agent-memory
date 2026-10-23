@@ -1,0 +1,44 @@
+{
+  "name": "agent-memory",
+  "version": "0.1.0",
+  "description": "Durable project and user memory with semantic search for Claude Code.",
+  "author": {
+    "name": "Rashad Ansari",
+    "url": "https://github.com/RashadAnsari"
+  },
+  "hooks": {
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "PLATFORM=claude-code bash \"${CLAUDE_PLUGIN_ROOT}/hooks/session-start.sh\"",
+            "timeout": 30
+          }
+        ]
+      }
+    ],
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "PLATFORM=claude-code bash \"${CLAUDE_PLUGIN_ROOT}/hooks/user-prompt-submit.sh\"",
+            "timeout": 30
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "PLATFORM=claude-code bash \"${CLAUDE_PLUGIN_ROOT}/hooks/stop.sh\"",
+            "timeout": 30
+          }
+        ]
+      }
+    ]
+  }
+}

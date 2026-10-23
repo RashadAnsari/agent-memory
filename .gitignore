@@ -1,0 +1,21 @@
+# macOS
+.DS_Store
+
+# Editor
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Python
+__pycache__/
+*.pyc
+
+# Agent memory
+*.sqlite
+*.sqlite-shm
+*.sqlite-wal
+
+# Temp
+*.tmp
+*.log

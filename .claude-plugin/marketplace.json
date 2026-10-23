@@ -1,0 +1,14 @@
+{
+  "name": "agent-memory",
+  "description": "Rashad Ansari's agent-memory plugin marketplace for Claude Code.",
+  "owner": {
+    "name": "Rashad Ansari",
+    "url": "https://github.com/RashadAnsari/agent-memory"
+  },
+  "plugins": [
+    {
+      "name": "agent-memory",
+      "source": "./plugins/agent-memory"
+    }
+  ]
+}

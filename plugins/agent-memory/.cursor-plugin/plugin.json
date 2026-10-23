@@ -1,0 +1,25 @@
+{
+  "name": "agent-memory",
+  "version": "0.1.0",
+  "description": "Durable project and user memory with semantic search for Cursor.",
+  "author": {
+    "name": "Rashad Ansari",
+    "url": "https://github.com/RashadAnsari"
+  },
+  "hooks": {
+    "version": 1,
+    "hooks": {
+      "sessionStart": [
+        {
+          "command": "PLATFORM=cursor bash \"${CURSOR_PLUGIN_ROOT}/hooks/session-start.sh\""
+        }
+      ],
+      "stop": [
+        {
+          "command": "PLATFORM=cursor bash \"${CURSOR_PLUGIN_ROOT}/hooks/stop.sh\"",
+          "loop_limit": 1
+        }
+      ]
+    }
+  }
+}

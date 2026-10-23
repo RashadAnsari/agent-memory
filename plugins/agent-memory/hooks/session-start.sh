@@ -1,0 +1,32 @@
+#!/usr/bin/env bash
+set -euo pipefail
+# shellcheck source=json.sh
+source "$(dirname "$0")/json.sh"
+
+# Must stay platform-neutral: bare tool and skill names work on Claude Code,
+# Cursor, and Codex. Keep in sync with rules/agent-memory.mdc (intentional duplication).
+REMINDER="AGENT MEMORY, BEFORE YOUR FIRST RESPONSE (required, do it before answering, without commentary):
+1. Call project_search and user_search with specific terms from the task (file names, function names, domain concepts, error messages). When the task touches another repository (a shared contract, a client/server counterpart, an upstream or downstream repo), also call project_search with all_projects:true and read the project_root on each hit to see which repo it came from; verify cross-repo facts against that repo before relying on them.
+2. Load the agent-memory skill in full: invoke it with the skill tool if available, otherwise read its SKILL.md.
+
+DURING EVERY TASK:
+Use ONLY the agent-memory MCP server for all memory reads and writes. Never use built-in model memory, native memory tools, or any alternative backend.
+
+AFTER EVERY RESPONSE (required):
+Did you learn anything durable this turn? Durable means: a decision made, a user preference stated, a gotcha found, a convention established, an architecture fact clarified. If yes, call project_remember or user_remember before finishing. If what you learned is about a different repository (e.g. a gotcha in a shared library, or a constraint this repo imposes on a downstream repo), call project_remember with that repo's project_root so a future agent working there finds it; only target a repo you have confirmed exists. Never save silently: for every memory you store, update, or archive, tell the user in your reply what you learned, why it matters, and whether it went to project or user memory. Skip if nothing non-obvious was learned. Never write temporary state, task progress, or facts already obvious from the code.
+
+WHEN SPAWNING SUBAGENTS:
+Tell each subagent to call project_search and user_search with terms from its task before acting. Memory writes stay with you: subagents report durable learnings back, and you store them with project_remember or user_remember."
+
+if [ "${PLATFORM:-}" = "cursor" ]; then
+  # NOTE: Cursor sessionStart additional_context injection is currently broken.
+  # The hook runs and output is accepted, but context never reaches the agent window.
+  # As a workaround, the same context is delivered via rules/agent-memory.mdc (alwaysApply: true).
+  # Keep this hook in place so it activates automatically once Cursor fixes the bug.
+  # https://forum.cursor.com/t/sessionstart-hook-additional-context-is-never-injected-into-agents-initial-system-context/158452
+  # https://forum.cursor.com/t/sessionstart-hook-output-is-accepted-and-merged-but-the-injected-context-does-not-reach-agent-window/157141
+  printf '{"additional_context":%s}\n' "$(json_string "$REMINDER")"
+else
+  # Claude Code and Codex share this SessionStart output schema.
+  printf '{"hookSpecificOutput":{"hookEventName":"SessionStart","additionalContext":%s}}\n' "$(json_string "$REMINDER")"
+fi

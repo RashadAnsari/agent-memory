@@ -1,0 +1,59 @@
+name: Build
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+    branches: [master]
+
+jobs:
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Set up uv
+        uses: astral-sh/setup-uv@v5
+
+      - name: Install Claude Code CLI
+        run: npm install -g @anthropic-ai/claude-code
+
+      - name: Install Codex CLI
+        run: npm install -g @openai/codex
+
+      - name: Cache HuggingFace model
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/huggingface
+          key: hf-model-bge-small-en-v1.5
+
+      - name: Sync agent-memory MCP server dependencies
+        working-directory: plugins/agent-memory/mcp-servers/agent-memory
+        run: uv sync
+
+      - name: Validate
+        run: make validate
+
+      - name: Install the plugin into Codex
+        run: |
+          codex plugin marketplace add .
+          codex plugin add agent-memory@agent-memory
+          codex plugin list | grep -q "installed, enabled"
+
+      - name: Check formatting
+        run: |
+          make format
+          git diff --exit-code || (echo "make format produced changes: run 'make format' locally and commit the result." && exit 1)
+
+      - name: Lint
+        run: make lint
+
+      - name: Test
+        run: make test
