@@ -55,6 +55,22 @@ After any change that affects what users see (a skill, hook, MCP tool, install s
 
 ---
 
+## Version Rule
+
+Every change bumps the version in the same change. Claude Code and Codex cache a plugin by the version in its manifest, so a change that keeps the old version never reaches users who update.
+
+The version appears in five places, and all of them must hold the same value:
+
+- `plugins/agent-memory/.claude-plugin/plugin.json`
+- `plugins/agent-memory/.codex-plugin/plugin.json`
+- `plugins/agent-memory/.cursor-plugin/plugin.json`
+- `plugins/agent-memory/mcp-servers/agent-memory/pyproject.toml`
+- `plugins/agent-memory/mcp-servers/agent-memory/uv.lock`: run `uv lock` in that folder after editing `pyproject.toml`
+
+Follow semantic versioning: a patch bump for fixes and for changes that do not alter behavior, a minor bump for new features or changed behavior, and a major bump for breaking changes, such as a renamed MCP tool or a database older versions cannot read. Once the change is on `master`, tag that commit `v<version>` and push the tag.
+
+---
+
 ## Verify After Changes Rule
 
 After completing any change, run from the repository root:

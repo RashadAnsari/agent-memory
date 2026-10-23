@@ -1,6 +1,6 @@
 {
   "name": "agent-memory",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Durable project and user memory with semantic search for Claude Code.",
   "author": {
     "name": "Rashad Ansari",
